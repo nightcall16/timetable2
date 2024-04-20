@@ -89,4 +89,25 @@ export class LessionsController {
       });
     }
   }
+
+  @Get('faculties')
+  async faculties(@Res() response: Response) {
+    try {
+      const result = await this.prisma.lessions.findMany({
+        select: {
+          faculty: true,
+        },
+      });
+
+      const uniqueFaculties = [...new Set(result.map((item) => item.faculty))];
+
+      return response.status(200).json({
+        result: uniqueFaculties,
+      });
+    } catch (error) {
+      return response.status(400).json({
+        error: error.message,
+      });
+    }
+  }
 }
