@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -12,7 +13,7 @@ import { LessionsService } from './lessions.service';
 import { PrismaClient } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Request, Response } from 'express';
-import { lession } from './interfaces';
+import { lession, weekDay } from './interfaces';
 
 @Controller('api')
 export class LessionsController {
@@ -31,6 +32,7 @@ export class LessionsController {
     @Body('classroomNumber') classroomNumber: number,
     @Body('groupNumber') groupNumber: number,
     @Body('faculty') faculty: string,
+    @Body('weekDay') weekDay: weekDay,
     @Res() response: Response,
   ) {
     try {
@@ -41,11 +43,16 @@ export class LessionsController {
         !endsAt ||
         !classroomNumber ||
         !groupNumber ||
-        !faculty
+        !faculty ||
+        !weekDay
       ) {
         return response.status(400).json({
           error: 'какое-то из обязательных свойств для занятия пропущено',
         });
+      }
+
+      if (!Object.values(weekDay).includes(weekDay)) {
+        throw new BadRequestException('Invalid weekDay value');
       }
 
       const lession = await this.lessionsService.addLession(
@@ -56,10 +63,37 @@ export class LessionsController {
         classroomNumber,
         groupNumber,
         faculty,
+        weekDay,
       );
 
       return response.status(200).json({
         lession,
+      });
+    } catch (error) {
+      return response.status(400).json({
+        error: error.message,
+      });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('delete-lession')
+  async deleteLession(@Body('id') id: number, @Res() response: Response) {
+    try {
+      if (!id) {
+        return response.status(400).json({
+          error: 'поле id пропущено',
+        });
+      }
+
+      const result = await this.prisma.lessions.delete({
+        where: {
+          id,
+        },
+      });
+
+      return response.status(200).json({
+        result,
       });
     } catch (error) {
       return response.status(400).json({

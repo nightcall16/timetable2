@@ -13,6 +13,7 @@ export class LessionsService {
     classroomNumber: number,
     groupNumber: number,
     faculty: string,
+    weekDay: number,
   ) {
     const lession = await this.prisma.lessions.create({
       data: {
@@ -23,6 +24,7 @@ export class LessionsService {
         classroomNumber,
         groupNumber,
         faculty,
+        weekDay,
       },
     });
 

@@ -26,4 +26,5 @@ model Lessions {
   classroomNumber Int
   groupNumber     Int
   faculty         String
+  weekDay         Int @default(1)
 }
