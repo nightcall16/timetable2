@@ -13,7 +13,7 @@ import { LessionsService } from './lessions.service';
 import { PrismaClient } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Request, Response } from 'express';
-import { lession, weekDay } from './interfaces';
+import { lession, weekDays } from './interfaces';
 
 @Controller('api')
 export class LessionsController {
@@ -32,7 +32,7 @@ export class LessionsController {
     @Body('classroomNumber') classroomNumber: number,
     @Body('groupNumber') groupNumber: number,
     @Body('faculty') faculty: string,
-    @Body('weekDay') weekDay: weekDay,
+    @Body('weekDay') weekDay: weekDays,
     @Res() response: Response,
   ) {
     try {
@@ -51,7 +51,7 @@ export class LessionsController {
         });
       }
 
-      if (!Object.values(weekDay).includes(weekDay)) {
+      if (!Object.values(weekDays).includes(weekDay)) {
         throw new BadRequestException('Invalid weekDay value');
       }
 

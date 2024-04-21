@@ -8,7 +8,7 @@ export interface lession {
   faculty: string;
 }
 
-export enum weekDay {
+export enum weekDays {
   day1 = 1,
   day2 = 2,
   day3 = 3,
