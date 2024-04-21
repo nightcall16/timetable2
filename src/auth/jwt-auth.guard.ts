@@ -10,7 +10,14 @@ import * as jwt from 'jsonwebtoken';
 export class JwtAuthGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const accessToken = request.cookies['accessToken'];
+    let accessToken = request.cookies['accessToken'];
+
+    if (!accessToken) {
+      const authHeader = request.headers['authorization'];
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        accessToken = authHeader.substring(7);
+      }
+    }
 
     if (!accessToken) {
       throw new UnauthorizedException('Access token not found');
