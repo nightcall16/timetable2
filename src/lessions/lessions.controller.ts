@@ -7,13 +7,18 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LessionsService } from './lessions.service';
 import { PrismaClient } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Request, Response } from 'express';
 import { lession, weekDays } from './interfaces';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('api')
 export class LessionsController {
@@ -143,5 +148,12 @@ export class LessionsController {
         error: error.message,
       });
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('upload-lession')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return this.lessionsService.processExcelFile(file);
   }
 }
